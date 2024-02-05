@@ -3,6 +3,7 @@ from llama_index import StorageContext, SimpleDirectoryReader, ServiceContext, V
 from llama_index.vector_stores import WeaviateVectorStore
 from llama_index.embeddings import LangchainEmbedding
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from llama_index.llms import Ollama
 import box
 import yaml
 
@@ -29,7 +30,7 @@ def load_documents(docs_path):
         OSError: If an error occurs during file iteration or processing.
 
     """
-    documents = SimpleDirectoryReader(docs_path, required_exts=[".jpg"]).load_data()
+    documents = SimpleDirectoryReader(docs_path, required_exts=[".pdf"]).load_data()
     print(f"Loaded {len(documents)} documents")
     return documents
 
@@ -54,7 +55,7 @@ def load_embedding_model(model_name):
     return embeddings
 
 
-def build_index(weaviate_client, embed_model, documents, index_name):
+def build_index(ollama_base_url,ollama_model,weaviate_client, embed_model, documents, index_name):
     """
     Constructs and populates a Weaviate Vector Store index with embedded document representations.
 
@@ -87,7 +88,8 @@ def build_index(weaviate_client, embed_model, documents, index_name):
         Additionally, ensure the Weaviate client has access and appropriate permissions to the specified index.
 
     """
-    service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=None)
+    llm = Ollama(base_url=ollama_base_url,model=ollama_model)
+    service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=llm)
     vector_store = WeaviateVectorStore(weaviate_client=weaviate_client, index_name=index_name)
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
@@ -116,5 +118,5 @@ if __name__ == "__main__":
     embeddings = load_embedding_model(model_name=cfg.EMBEDDINGS)
 
     print("Building index...")
-    index = build_index(client, embeddings, documents, cfg.INDEX_NAME)
+    index = build_index(cfg.OLLAMA_BASE_URL,cfg.LLM, client, embeddings, documents, cfg.INDEX_NAME)
 

@@ -1,3 +1,10 @@
+'''
+Description: 
+Author: haichun feng
+Date: 2024-02-04 15:30:52
+LastEditor: haichun feng
+LastEditTime: 2024-02-05 17:20:10
+'''
 from llama_index import VectorStoreIndex, ServiceContext
 from llama_index.embeddings import LangchainEmbedding
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -76,7 +83,7 @@ def build_rag_pipeline():
     client = weaviate.Client(cfg.WEAVIATE_URL)
 
     print("Loading Ollama...")
-    llm = Ollama(model=cfg.LLM, temperature=0)
+    llm = Ollama(base_url=cfg.OLLAMA_BASE_URL,model=cfg.LLM, temperature=0)
 
     print("Loading embedding model...")
     embeddings = load_embedding_model(model_name=cfg.EMBEDDINGS)
