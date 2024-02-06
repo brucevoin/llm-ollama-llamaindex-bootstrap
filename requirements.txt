@@ -1,6 +1,7 @@
 llama-index==0.9.13
 langchain==0.0.345
 sentence-transformers
-weaviate-client
+weaviate-client==4.4.1
 pypdf
 python-box
+flask

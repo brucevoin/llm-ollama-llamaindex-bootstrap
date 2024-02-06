@@ -1,6 +1,18 @@
 ---
 version: '3.4'
 services:
+  llm-service:
+    container_name: llm-service
+    image: docker.io/library/llamaindex-rag:v1 
+    # llm-service port is 5000
+    network_mode: host
+    # ports:
+    #   - 5000:5000
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - weaviate
+
   weaviate:
     container_name: weaviate-db
     command:
@@ -11,9 +23,10 @@ services:
     - --scheme
     - http
     image: semitechnologies/weaviate:1.22.4
-    ports:
-    - 8080:8080
-    - 50051:50051
+    network_mode: host
+    # ports:
+    # - 8080:8080
+    # - 50051:50051
     volumes:
     - weaviate_data:/var/lib/weaviate
     restart: on-failure:0
