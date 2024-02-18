@@ -1,10 +1,11 @@
-'''
+"""
 Description: 
 Author: haichun feng
 Date: 2024-02-04 15:30:52
 LastEditor: haichun feng
-LastEditTime: 2024-02-05 17:20:10
-'''
+LastEditTime: 2024-02-18 10:37:21
+"""
+
 from llama_index import VectorStoreIndex, ServiceContext
 from llama_index.embeddings import LangchainEmbedding
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -16,26 +17,25 @@ import yaml
 
 
 def load_embedding_model(model_name):
-    embeddings = LangchainEmbedding(
-        HuggingFaceEmbeddings(model_name=model_name)
-    )
+    embeddings = LangchainEmbedding(HuggingFaceEmbeddings(model_name=model_name))
     return embeddings
 
 
 def load_index(chunk_size, llm, embed_model, weaviate_client, index_name):
     service_context = ServiceContext.from_defaults(
-        chunk_size=chunk_size,
-        llm=llm,
-        embed_model=embed_model
+        chunk_size=chunk_size, llm=llm, embed_model=embed_model
     )
 
-    vector_store = WeaviateVectorStore(weaviate_client=weaviate_client, index_name=index_name)
+    vector_store = WeaviateVectorStore(
+        weaviate_client=weaviate_client, index_name=index_name
+    )
 
     index = VectorStoreIndex.from_vector_store(
         vector_store, service_context=service_context
     )
 
     return index
+
 
 def build_rag_pipeline():
     """
@@ -76,14 +76,22 @@ def build_rag_pipeline():
 
     """
     # Import configuration specified in config.yml
-    with open('config.yml', 'r', encoding='utf8') as ymlfile:
+    with open("config.yml", "r", encoding="utf8") as ymlfile:
         cfg = box.Box(yaml.safe_load(ymlfile))
 
     print("Connecting to Weaviate")
     client = weaviate.Client(cfg.WEAVIATE_URL)
+    # client = weaviate.connect_to_custom(
+    #     http_host=cfg.WEAVIATE_HOST,
+    #     http_port=cfg.WEAVIATE_HTTP_PORT,
+    #     http_secure=False,
+    #     grpc_host=cfg.WEAVIATE_HOST,
+    #     grpc_port=cfg.WEAVIATE_UDP_PORT,
+    #     grpc_secure=False,
+    # )
 
     print("Loading Ollama...")
-    llm = Ollama(base_url=cfg.OLLAMA_BASE_URL,model=cfg.LLM, temperature=0)
+    llm = Ollama(base_url=cfg.OLLAMA_BASE_URL, model=cfg.LLM, temperature=0)
 
     print("Loading embedding model...")
     embeddings = load_embedding_model(model_name=cfg.EMBEDDINGS)

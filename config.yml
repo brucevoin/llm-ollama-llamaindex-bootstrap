@@ -4,5 +4,8 @@ LLM: 'codellama:latest'
 OLLAMA_BASE_URL: 'http://192.168.6.179:24234'
 EMBEDDINGS: 'sentence-transformers/all-mpnet-base-v2'
 WEAVIATE_URL: 'http://localhost:8080'
+WEAVIATE_HOST: 'localhost'
+WEAVIATE_HTTP_PORT: 8080
+WEAVIATE_UDP_PORT: 50051
 INDEX_NAME: 'Sparrow3'
 CHUNK_SIZE: 1000
