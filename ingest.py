@@ -1,5 +1,10 @@
 import weaviate
-from llama_index import StorageContext, SimpleDirectoryReader, ServiceContext, VectorStoreIndex
+from llama_index import (
+    StorageContext,
+    SimpleDirectoryReader,
+    ServiceContext,
+    VectorStoreIndex,
+)
 from llama_index.vector_stores import WeaviateVectorStore
 from llama_index.embeddings import LangchainEmbedding
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
@@ -8,6 +13,7 @@ import box
 import yaml
 
 import warnings
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
@@ -49,13 +55,13 @@ def load_embedding_model(model_name):
         This function utilizes the `LangchainEmbedding` wrapper around the underlying `HuggingFaceEmbeddings` class.
 
     """
-    embeddings = LangchainEmbedding(
-        HuggingFaceEmbeddings(model_name=model_name)
-    )
+    embeddings = LangchainEmbedding(HuggingFaceEmbeddings(model_name=model_name))
     return embeddings
 
 
-def build_index(ollama_base_url,ollama_model,weaviate_client, embed_model, documents, index_name):
+def build_index(
+    ollama_base_url, ollama_model, weaviate_client, embed_model, documents, index_name
+):
     """
     Constructs and populates a Weaviate Vector Store index with embedded document representations.
 
@@ -88,9 +94,11 @@ def build_index(ollama_base_url,ollama_model,weaviate_client, embed_model, docum
         Additionally, ensure the Weaviate client has access and appropriate permissions to the specified index.
 
     """
-    llm = Ollama(base_url=ollama_base_url,model=ollama_model)
+    llm = Ollama(base_url=ollama_base_url, model=ollama_model)
     service_context = ServiceContext.from_defaults(embed_model=embed_model, llm=llm)
-    vector_store = WeaviateVectorStore(weaviate_client=weaviate_client, index_name=index_name)
+    vector_store = WeaviateVectorStore(
+        weaviate_client=weaviate_client, index_name=index_name
+    )
     storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
     index = VectorStoreIndex.from_documents(
@@ -102,21 +110,25 @@ def build_index(ollama_base_url,ollama_model,weaviate_client, embed_model, docum
     return index
 
 
-if __name__ == "__main__":
-    
+def ingest_data(data_path):
     # Import configuration specified in config.yml
-    with open('config.yml', 'r', encoding='utf8') as configuration:
+    with open("config.yml", "r", encoding="utf8") as configuration:
         cfg = box.Box(yaml.safe_load(configuration))
 
     print("Connecting to Weaviate")
     client = weaviate.Client(cfg.WEAVIATE_URL)
 
     print("Loading documents...")
-    documents = load_documents(cfg.DATA_PATH)
+    documents = load_documents(data_path)
 
     print("Loading embedding model...")
     embeddings = load_embedding_model(model_name=cfg.EMBEDDINGS)
 
     print("Building index...")
-    index = build_index(cfg.OLLAMA_BASE_URL,cfg.LLM, client, embeddings, documents, cfg.INDEX_NAME)
+    index = build_index(
+        cfg.OLLAMA_BASE_URL, cfg.LLM, client, embeddings, documents, cfg.INDEX_NAME
+    )
 
+
+# if __name__ == "__main__":
+#     ingest()
