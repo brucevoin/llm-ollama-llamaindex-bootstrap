@@ -5,3 +5,5 @@ weaviate-client==4.4.1
 pypdf
 python-box
 flask
+EbookLib
+html2text

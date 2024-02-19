@@ -56,9 +56,12 @@ def chat():
         else:
             if prompt is not None:
                 print('Retrieving answer...')
-                answer = rag_chain.query(prompt)
-                answer = str(answer).strip()
-                print('\n' + answer + '\n')
+                try:
+                    answer = rag_chain.query(prompt)
+                    answer = str(answer).strip()
+                    print('\n' + answer + '\n')
+                except ConnectionError:
+                    print('\nConnectionError')
                 continue
             else:
                 continue

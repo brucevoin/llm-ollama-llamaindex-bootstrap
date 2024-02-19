@@ -18,43 +18,12 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 
 def load_documents(docs_path):
-    """
-    This function retrieves and returns a list of JPEG documents from a specified directory.
-
-    It utilizes the `SimpleDirectoryReader` class from the `pathlib` module to efficiently iterate through all files
-    with the `.jpg` extension within the provided directory. The function then prints the total number of loaded documents
-    before returning them as a list.
-
-    Args:
-        docs_path: The absolute or relative path to the directory containing the target JPEG documents.
-
-    Returns:
-        A list of `SimpleDirectoryReader` objects, each representing an individual JPEG file within the directory.
-
-    Raises:
-        FileNotFoundError: If the specified directory path is invalid or inaccessible.
-        OSError: If an error occurs during file iteration or processing.
-
-    """
-    documents = SimpleDirectoryReader(docs_path, required_exts=[".pdf"]).load_data()
+    documents = SimpleDirectoryReader(docs_path, required_exts=[".pdf",".epub"]).load_data()
     print(f"Loaded {len(documents)} documents")
     return documents
 
 
 def load_embedding_model(model_name):
-    """
-    Creates and returns a LangchainEmbedding object based on a specified Hugging Face model name.
-
-    Args:
-        model_name: The string identifier of the desired pre-trained embedding model from Hugging Face.
-
-    Returns:
-        A LangchainEmbedding object configured with the chosen Hugging Face model.
-
-    Notes:
-        This function utilizes the `LangchainEmbedding` wrapper around the underlying `HuggingFaceEmbeddings` class.
-
-    """
     embeddings = LangchainEmbedding(HuggingFaceEmbeddings(model_name=model_name))
     return embeddings
 
